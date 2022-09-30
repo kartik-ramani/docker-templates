@@ -9,7 +9,7 @@ terraform {
 }
 
 resource "aws_security_group" "sg" {
-  name = "securitygroup"
+  name        = "securitygroup"
   description = "Allow HTTP and SSH traffic via Terraform"
 
   ingress {
@@ -54,7 +54,7 @@ resource "tls_private_key" "pk" {
 }
 
 resource "aws_key_pair" "kp" {
-  key_name   = "myKey"       # Create a "myKey" to AWS!!
+  key_name   = "myKey" # Create a "myKey" to AWS!!
   public_key = tls_private_key.pk.public_key_openssh
 
   provisioner "local-exec" { # Create a "myKey.pem" to your computer!!
@@ -64,9 +64,9 @@ resource "aws_key_pair" "kp" {
 
 
 resource "aws_instance" "app_server" {
-  ami           = "ami-08df94af6199f15b6"
-  instance_type = "t2.micro"
-  key_name = aws_key_pair.kp.id
+  ami                    = "ami-08df94af6199f15b6"
+  instance_type          = "t2.micro"
+  key_name               = aws_key_pair.kp.id
   vpc_security_group_ids = [aws_security_group.sg.id]
   tags = {
     Name = "ExapleTeraaform"
@@ -74,21 +74,20 @@ resource "aws_instance" "app_server" {
 
 
   connection {
-    type     = "ssh"
-    user     = "ubuntu"
+    type        = "ssh"
+    user        = "ubuntu"
     private_key = file("${var.keyName}.pem")
-    host     = self.public_ip
+    host        = self.public_ip
   }
 
 
   provisioner "remote-exec" {
-      inline = [
-        "sudo apt update",
-        "sudo apt upgrade - y",
-        "sudo uwf allow 8080",
-        "sudo apt install docker.io -y && sudo apt install docker-compose -y && git clone https://github.com/kartik-ramani/sample.git && cd sample && sudo docker-compose up -d "
-      ]
-    
+    inline = [
+      "sudo apt update",
+      "sudo apt upgrade - y",
+      "sudo apt install docker.io -y && sudo docker run -dp 80:80 docker/getting-started"
+    ]
+
   }
 
 
@@ -97,16 +96,13 @@ resource "aws_instance" "app_server" {
   ]
 }
 
-
-
-# inline = [
+#  inline = [
 #         "sudo apt update",
 #         "sudo apt upgrade - y",
 #         "sudo uwf allow 8080",
 #         "sudo apt install docker.io -y && sudo apt install docker-compose -y && git clone https://github.com/kartik-ramani/sample.git && cd sample && sudo docker-compose up -d "
 #       ]
 
-# && cd sample && sudo docker-compose up -d
 
 // Docker run from Docker File
 # inline = [
