@@ -55,3 +55,22 @@ resource "aws_s3_object" "errorfile" {
   key = var.errorname
   source = "index.html"
 }
+
+
+resource "aws_s3_bucket_website_configuration" "s3_bucket" {
+  bucket = name.s3_bucket.id
+
+  index_document {
+    suffix = "index.html"
+  }
+
+  error_document {
+    key = "error.html"
+  }
+}
+
+
+output "domain" {
+  description = "Domain name of the bucket"
+  value       = aws_s3_bucket_website_configuration.s3_bucket.website_domain
+}
